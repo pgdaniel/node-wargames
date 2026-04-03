@@ -1,11 +1,4 @@
-WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMain.swf';
-
 (function () {
-	if (!window.WebSocket) {
-		$('body').empty();
-		alert('This page requires Websocket support. Please use Chrome or Safari.');
-	}
-
 	setTimeout(function () {
 		new ircMap({
 			bowArcHeight: 200, // px
@@ -49,7 +42,7 @@ WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMain.swf';
 			'margin-left': '-' + (mapWidth / 2) + 'px'
 		});
 
-		$('.marker').live('mouseover', function (event) {
+		$(document).on('mouseover', '.marker', function (event) {
 			var lastActivity = $(this).attr('data-activity');
 			var $counter = $('<div class="lastActivity">active <span></span> sec ago</div>').appendTo(this).find('span');
 
@@ -63,7 +56,7 @@ WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMain.swf';
 			$(this).data('activity', activityInterval);
 			$('.marker').addClass('dampened');
 
-		}).live('mouseout', function (event) {
+		}).on('mouseout', '.marker', function (event) {
 			clearTimeout($(this).data('activity'));
 			$(this).find('.lastActivity').remove();;
 			$('.marker').removeClass('dampened');
@@ -300,17 +293,7 @@ WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMain.swf';
 		}
 
 		function initWebsocketConnection() {
-			var server = new io.Socket(null, {
-				'port': '#socketIoPort#'
-				, 'rememberTransport': true
-				, 'transports': [
-					'websocket'
-					, 'flashsocket'
-					, 'htmlfile'
-					, 'xhr-multipart'
-					, 'xhr-polling'
-				]
-			}); 
+			var server = io();
 			server.on('message', function(msg) {
 				var data = JSON.parse(msg);
 				var lastActivityTimestamp;
@@ -363,7 +346,6 @@ WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMain.swf';
 					initWebsocketConnection();
 				}, 3000);
 			});
-			server.connect();
 		}
 		initWebsocketConnection();
 	}
